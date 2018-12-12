@@ -25,6 +25,8 @@ class Follow(Timestamp):
     following = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="is_following")
     followed = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="followed_by")
 
+    def __str__(self):
+        return f"Following: {self.following}, Followed: {self.followed}"
 
 class Post(Timestamp):
     title = models.CharField(max_length=250)
@@ -35,6 +37,9 @@ class Post(Timestamp):
     favorited_by = models.ManyToManyField(User, through='Favorite', related_name='favorite_posts')
     liked_by = models.ManyToManyField(User, through='Like', related_name='liked_posts')
 
+    def __str__(self):
+        return self.title
+    
     def save(self, *args, **kwargs):
         if not self.id:
             self.slug = slugify(self.title)
@@ -58,9 +63,15 @@ class Favorite(Timestamp):
     class Meta:
         unique_together = ('post', 'user',)
 
+    def __str__(self):
+        return f"User: {self.user}, Post: {self.post}"
+
 class Like(Timestamp):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="likers")
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, related_name="likes")
 
     class Meta:
         unique_together = ('post', 'user',)
+
+    def __str__(self):
+        return f"User: {self.user}, Post: {self.post}"

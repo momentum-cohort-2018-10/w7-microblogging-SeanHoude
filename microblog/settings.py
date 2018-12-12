@@ -71,7 +71,7 @@ ROOT_URLCONF = 'microblog.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'blog/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -106,6 +106,7 @@ DATABASES = {
         "PORT": "5432",
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -167,8 +168,7 @@ MESSAGE_TAGS = {
     messages.WARNING: 'callout warning',
     messages.ERROR: 'callout alert',
 }
+AUTH_USER_MODEL = "blog.User"
 SITE_ID = 1
 # Activate Django-Heroku.
-django_heroku.settings(locals())
-
-AUTH_USER_MODEL = "blog.User"
+# django_heroku.settings(locals())

@@ -15,7 +15,6 @@
 </head>
 <body>
   <header>
-    <h1>TwitFeed</h1>
     {% comment %}    Navbar    {% endcomment %}
     <nav>
       <ul class="top-bar">
@@ -29,7 +28,13 @@
                 <li class="glow"><a href="#">Your comments</a></li>
                 <li class="glow"><a href="#">Your favorites</a></li>
                 <li class="glow"><a href="#">Your followers</a></li>
-                <li class="glow"><a href="#">Following</a></li>
+                <li><a href="#">Following</a>
+                  <ul class="menu vertical nested">
+                    {% for user in request.user.users_followed.all %}
+                    <li class="glow"><a href="#">{{ user }}</a></li>
+                    {% endfor %}
+                  </ul>
+                </li>
               </ul>
             </li>
           </ul>
@@ -38,7 +43,7 @@
           <ul class="menu">
             <form action="{% url 'search' %}" method="GET">
               <li class="ilb"><input type="search" name="search"></li>
-              <li class="ilb"><button type="submit" class="button tiny search-button">Search</button></li>
+              <li class="ilb"><button type="submit" class="button small">Search</button></li>
             </form>
           {% if user.is_authenticated %}
             <li class="glow"><a href="{% url 'auth_logout' %}">Logout</a></li>
@@ -70,9 +75,9 @@
   <div class="grid-x">
     <div class="medium-1 columns"></div>
     <div class="medium-11 columns">
-      {% block Content %}
+      {% block content %}
 
-      {% endblock Content %}
+      {% endblock content %}
     </div>
   </div>
   {% block footer %}

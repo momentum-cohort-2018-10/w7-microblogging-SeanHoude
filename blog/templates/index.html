@@ -5,6 +5,15 @@
 {% endblock title %}
 
 {% block content %}
+<h1>You follow:</h1>
+{% for user in request.user.users_followed.all %}
+<p>{{ user }}</p>
+{% endfor %}
+<h1>Users following you</h1>
+{% for follower in request.user.followers.all %}
+{{ follower }}
+<p></p>
+{% endfor %}
   <h1><a href="{% provider_login_url 'github' %}"></a></h1>
   <div class="blog-post">
   {% for post in posts %}
