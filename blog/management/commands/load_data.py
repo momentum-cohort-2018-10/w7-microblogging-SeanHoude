@@ -1,12 +1,8 @@
 from django.core.management.base import BaseCommand
-from django.conf import settings
-import os.path
-from django.contrib.auth.models import User
+from blog.models import User, Post, Comment, Like, Favorite, Follow
 from mimesis import Person
-from blog.models import Post, Comment, Like, Favorite
-from django.core.files import File
-import random
 from faker import Faker
+import random
 
 class Command(BaseCommand):
     help = "Create fake data for testing blog layout"
@@ -58,5 +54,8 @@ class Command(BaseCommand):
         for i in range(200):
             Comment.objects.create(post=posts[random.randrange(50)], user=users[random.randrange(100)], comment=fake.sentence())
         print('200 comments imported!')
+
+        for i in range(100):
+            Follow.objects.create(following=users[i], followed=users[random.randrange(30)])
 
         print('All data imported successfully!')

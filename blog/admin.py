@@ -1,5 +1,5 @@
 from django.contrib import admin
-from blog.models import Post, Comment, Favorite, Like, Follow
+from blog.models import User, Post, Comment, Favorite, Like, Follow
 
 class PostAdmin(admin.ModelAdmin):
     model = Post
@@ -18,12 +18,18 @@ class LikeAdmin(admin.ModelAdmin):
     model = Like
     list_display = ('user', 'post', 'created', 'updated', )
 
-class FollowAdmin(admin.ModelAdmin):
+class FollowersInline(admin.StackedInline):
     model = Follow
-    list_display = ('follower', 'followed', 'created', 'updated', )
+    fk_name = 'followed'
+    fields = ('following',)
+    extra = 1
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    fields = ('username', 'email', 'is_superuser', 'is_staff', 'is_active',)
+    inlines = [FollowersInline]
 
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Favorite, FavoriteAdmin)
 admin.site.register(Like, LikeAdmin)
-admin.site.register(Follow, FollowAdmin)

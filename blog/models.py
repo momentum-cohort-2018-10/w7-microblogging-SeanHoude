@@ -1,6 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
 from django.template.defaultfilters import slugify
+from django.contrib.auth.models import AbstractUser
 
 class Timestamp(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -9,12 +9,29 @@ class Timestamp(models.Model):
     class Meta:
         abstract = True
 
+class User(AbstractUser):
+    # users_followed returns all users a specific user (clinton) is following.
+    #   ex clinton following Rondale and Peter
+    #   clinton = User.objects.create('clinton')
+    #   clinton.users_followed.all() - // <queryset[<user: rondale>, <user: peter>]> 
+
+    # followers returns all users a specific user (tiana) is followed by.
+    #   ex. Clinton and Rondale following Tiana
+    #   tiana = User.objects.create('clinton')
+    #   tiana.followers.all() - // <queryset[<user: clinton>, <user: rondale>]>
+    users_followed = models.ManyToManyField(to='User', through='Follow', through_fields=('following', 'followed'), related_name="followers")
+
+class Follow(Timestamp):
+    following = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="is_following")
+    followed = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="followed_by")
+
+
 class Post(Timestamp):
     title = models.CharField(max_length=250)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     description = models.TextField()
     url = models.URLField(max_length=400, null=True, blank=True)
-    slug = models.SlugField(unique=True, max_length=50)
+    slug = models.SlugField(unique=True, max_length=250)
     favorited_by = models.ManyToManyField(User, through='Favorite', related_name='favorite_posts')
     liked_by = models.ManyToManyField(User, through='Like', related_name='liked_posts')
 
@@ -47,7 +64,3 @@ class Like(Timestamp):
 
     class Meta:
         unique_together = ('post', 'user',)
-
-class Follow(Timestamp):
-    follower = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="followers")
-    followed = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, related_name="followed")

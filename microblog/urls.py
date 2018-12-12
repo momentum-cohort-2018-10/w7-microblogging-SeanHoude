@@ -32,7 +32,7 @@ urlpatterns = [
     path('accounts/password/reset/<uidb64>/<token>/', PasswordResetConfirmView.as_view(template_name='registration/password_reset_confirm.html'), name="password_reset_confirm"),
     path('accounts/password/done/', PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'), name="password_reset_complete"),
     # REST API urls
-    path('api-auth', include('rest_framework.urls', namespace='rest_framework')),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/v1/posts/', views.ListCreatePost.as_view(), name='post_list'),
     # Registration/admin urls
     path('admin/', admin.site.urls),
