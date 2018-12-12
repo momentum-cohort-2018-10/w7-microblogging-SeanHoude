@@ -9,6 +9,17 @@ verify_ssl = true
 django = "*"
 django-debug-toolbar = "*"
 psycopg2 = "*"
+djangorestframework = "*"
+mimesis = "*"
+django-dotenv = "*"
+django-crispy-forms = "*"
+django-extensions = "*"
+django-registration-redux = "*"
+faker = "*"
+pillow = "*"
+django-allauth = "*"
+python-dotenv = "*"
+django-heroku = "*"
 
 [requires]
 python_version = "3.7"

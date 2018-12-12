@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load socialaccount %}
+{% block title %}
+  Home - {{ block.super }}
+{% endblock title %}
+
+{% block content %}
+  <h1><a href="{% provider_login_url 'github' %}"></a></h1>
+  <div class="blog-post">
+  {% for post in posts %}
+    <div class="callout">
+    <h3><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }} <small>{{ post.created }}</small></a></h3>
+    <p>{{ post.description|truncatechars:150 }}</p>
+      <ul class="menu simple">
+        <li><a href="#">Favorited {{ post.favorites.count }} time{{ post.favorites.count|pluralize }}</a></li>
+        <li><a href="#">Liked {{ post.likes.count }} time{{ post.likes.count|pluralize }}</a></li>
+        <!--  show favorite button if user is logged in  -->
+        <form method="POST" action="{% url 'toggle_favorite' slug=post.slug %}">
+          {% csrf_token %}
+          <input type="hidden" name="post" value="{{ post.slug }}">
+          <button class="star-five" type="submit">
+            {% if post in favorite_posts %}
+            &#x2605; <!-- filled in star -->
+            {% else %}
+            &#x2606; <!-- empty star -->
+            {% endif %}
+          </button>
+        </form>
+      </ul>
+    </div>
+  {% endfor %}
+  </div>
+{% endblock content %}

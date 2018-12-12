@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% comment %} {% load static %} {% endcomment %}
+{% block title %}
+    Your votes - {{ block.super }}
+{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            {% for post in posts %}
+                <div class="col-md-4">
+                <h3>
+                    {% if post.url %}
+                    <a href=" {{ post.url }}">
+                    {% else %}
+                    <a href="{% url 'post_detail' slug=post.slug %}">
+                    {% endif %}
+                    {{ post.title }}</a>
+                </h3>
+                    <p>{{ post.description }}</p>
+                    <p>You created this link on {{ post.created|date:'m-d-Y'}}</p>
+                    <p><a class="btn btn-secondary" href="{% url 'post_detail' slug=post.slug %}" role="button">View Details &raquo;</a></p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %} 
+

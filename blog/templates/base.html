@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% load socialaccount %}
+<html class="no-js" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>
+        {% block title %}TwitFeed{% endblock title %}
+    </title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.5.1/dist/css/foundation.min.css" integrity="sha256-1mcRjtAxlSjp6XJBgrBeeCORfBp/ppyX4tsvpQVCcpA= sha384-b5S5X654rX3Wo6z5/hnQ4GBmKuIJKMPwrJXn52ypjztlnDK2w9+9hSMBz/asy9Gw sha512-M1VveR2JGzpgWHb0elGqPTltHK3xbvu3Brgjfg4cg5ZNtyyApxw/45yHYsZ/rCVbfoO5MSZxB241wWq642jLtA==" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block header %}{% endblock header %}
+</head>
+<body>
+  <header>
+    <h1>TwitFeed</h1>
+    {% comment %}    Navbar    {% endcomment %}
+    <nav>
+      <ul class="top-bar">
+        <div class="top-bar-left">
+          <ul class="dropdown menu" data-dropdown-menu>
+            <li class="menu-text">TwitFeed</li>
+              <li class="glow"><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="#">{{ request.user }}</a>
+              <ul class="menu vertical nested">
+                <li class="glow"><a href="#">Your likes</a></li>
+                <li class="glow"><a href="#">Your comments</a></li>
+                <li class="glow"><a href="#">Your favorites</a></li>
+                <li class="glow"><a href="#">Your followers</a></li>
+                <li class="glow"><a href="#">Following</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="top-bar-right">
+          <ul class="menu">
+            <form action="{% url 'search' %}" method="GET">
+              <li class="ilb"><input type="search" name="search"></li>
+              <li class="ilb"><button type="submit" class="button tiny search-button">Search</button></li>
+            </form>
+          {% if user.is_authenticated %}
+            <li class="glow"><a href="{% url 'auth_logout' %}">Logout</a></li>
+          {% else %}
+            <li class="glow"><a href="{% url 'auth_login' %}">Login</a></li>
+            <li class="glow"><a href="{% url 'registration_register' %}">Register</a></li>
+          {% endif %}
+          </ul>
+        </div>
+      </ul>
+    </nav>
+    {% comment %} Jumbotron {% endcomment %}
+    <div class="callout large primary">
+      <div class="grid-x">
+        <div class="row small-2 columns"></div>
+        <div class="row column small-8 text-center">
+          <h1>TwitFeed - Where twits come together</h1>
+        </div>
+        <div class="row small-2 columns"></div>
+      </div>
+    </div>
+  </header>
+  <div class="container">
+    {% for message in messages %}
+        <div {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% comment %} Twits {% endcomment %}
+  <div class="grid-x">
+    <div class="medium-1 columns"></div>
+    <div class="medium-11 columns">
+      {% block Content %}
+
+      {% endblock Content %}
+    </div>
+  </div>
+  {% block footer %}
+    <hr>
+    <footer class="container">
+      <p>&copy; Sean Houde 2018</p>
+    </footer>
+  {% endblock footer %}
+  <script src="{% static 'js/vendor/jquery.js' %}" defer></script>
+  <script src="{% static 'js/vendor/what-input.js' %}" defer></script>
+  <script src="{% static 'js/vendor/foundation.js' %}" defer></script>
+  <script src="{% static 'js/app.js' %}" defer></script>
+  <script src="{% static 'js/main.css' %}" defer></script>
+</body>
+</html>

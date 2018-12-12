@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% crispy form form.helper %}
+{% load static %}
+{% block title %}
+     {{ post.title }} - {{ block.super }}
+{% endblock title %}
+
+{% block articles %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      <h3>{{ post.title }}</h3>
+        <p>{{ post.description }}</p>
+        <p>Liked {{ post.likes.count }} time{{ post.likes.count|pluralize }}
+        {% if user.is_authenticated %}
+        <form action="{% url "like_detail" slug=post.slug %}" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name='post' value='{{ post.slug }}'> 
+        {% if post in request.user.liked_posts.all %}
+          <button type="submit"></button>
+          {% comment %} <input type="image" src="{% static 'images/removethumb.png' %}" /> {% endcomment %}
+        {% else %}
+          {% comment %} <input type="image" src="{% static 'images/thumbup.png' %}" /> {% endcomment %}
+        {% endif %}
+        </form>
+        {% endif %}
+        {% if request.user == post.author %}
+        <a href="{% url 'edit_post' slug=post.sluglol %}">
+          <input type="image" src="{% static 'images/edit.png' %}">
+        </a>
+        {% endif %}
+        <HR>
+        {% for comment in comments %}
+          <div class="comment">
+            <p>{{ comment.comment }} - <a href="{% url "user_profile" %}"><em>{{ comment.user }}</em></a> on {{ comment.created }}</p>
+            {% comment %} {% if request.user == comment.user %} {% endcomment %}
+            <form class="ilb" action="{% url 'delete_comment' pk=comment.pk slug=post.slug %}">
+            {% csrf_token %}
+            <input class="ilb" type="image" src="{% static 'images/delete.png' %}">
+            </form>
+            <a class="ilb" href="{% url 'edit_comment' pk=comment.pk slug=post.slug %}">
+            <input type="image" src="{% static 'images/edit.png' %}">
+            </a>
+            {% comment %} {% endif %} {% endcomment %}
+          </div>
+        {% endfor %}
+        {% if user.is_authenticated %}
+        <form method="POST" action="{% url 'add_comment_to_post' slug=post.slug %}" class="post-form">
+        {{ form|crispy }}
+        {% csrf_token %}
+          <input type="submit" value='Add comment'>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+<hr>
+    <h1>{{ post.title }}</h1>
+    <p>added on {{ post.created }}</p>
+    <p>{{ post.description }}</p>
+    {% if post.image %}<img class="cover-thumb" src="{{ post.image.url }}" alt="">{% endif %}
+    <p>{{ fav_post }}</p>
+    <p>{{ post.num_likes }}</p>
+    {% comment %} {% if user == post.creator %} {% endcomment %}
+        <p><a href="{% url 'edit_post' slug=post.slug %}">Edit me!</a></p>
+    {% comment %} {% endif %} {% endcomment %}
+{% endblock articles %}
