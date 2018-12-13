@@ -17,7 +17,7 @@
         <form class="toggle-favorite-form" method="POST" action="{% url 'toggle_favorite' slug=post.slug %}">
           {% csrf_token %}
           <input type="hidden" name="post" value="{{ post.slug }}">
-          <button class="star-five fav-button" type="submit">
+          <button class="fav-button" type="submit">
             {% if post in request.user.favorite_posts.all %}
             &#x2605; <!-- filled in star -->
             {% else %}
@@ -29,11 +29,23 @@
         <form class="toggle-like-form" method="POST" action="{% url 'toggle_like' slug=post.slug %}">
           {% csrf_token %}
           <input type="hidden" name="post" value="{{ post.slug }}">
-          <button class="star-five like-button" type="submit">
+          <button class="like-button" type="submit">
             {% if post in request.user.liked_posts.all %}
             &#x2605; <!-- filled in star -->
             {% else %}
             &#x2606; <!-- empty star -->
+            {% endif %}
+          </button>
+        </form>
+        <li><a href="{% url 'user_profile' username=post.user %}"> Hailer: {{ post.user }} -</a></li>
+        <form class="toggle-follow-form" method="POST" action="{% url 'toggle_follow' pk=post.user.pk %}">
+          {% csrf_token %}
+          <input type="hidden" name="follow">
+          <button class="follow-button" type="submit">
+            {% if post.user in request.user.users_followed.all %}
+            <li class="glow">Unfollow</li>
+            {% else %}
+            <li class="glow">Follow</li>
             {% endif %}
           </button>
         </form>

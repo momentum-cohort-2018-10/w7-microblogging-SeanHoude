@@ -20,14 +20,27 @@ class LikeAdmin(admin.ModelAdmin):
 
 class FollowersInline(admin.StackedInline):
     model = Follow
+    verbose_name = 'followed_by'
     fk_name = 'followed'
     fields = ('following',)
     extra = 1
 
+class FollowingInline(admin.StackedInline):
+    verbose_name = 'is_following'
+    model = Follow
+    fk_name = 'following'
+    fields = ('followed',)
+    extra = 1
+
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    model = Follow
+    list_display = ('following', 'followed',)
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     fields = ('username', 'email', 'is_superuser', 'is_staff', 'is_active',)
-    inlines = [FollowersInline]
+    inlines = [FollowersInline, FollowingInline]
 
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment, CommentAdmin)

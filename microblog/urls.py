@@ -13,7 +13,7 @@ from django.contrib.auth.views import (
 urlpatterns = [
     path('', views.index, name='home'),
     path('posts/<slug>/', views.post_detail, name='post_detail'),
-    path('create_post', views.create_post, name='create_post'),
+    path('create_hail', views.create_hail, name='create_hail'),
     path('posts/<slug>/edit_post/', views.edit_post, name='edit_post'),
     path('post/<slug>/add_comment_to_post', views.add_comment_to_post,
          name="add_comment_to_post"),
@@ -24,6 +24,7 @@ urlpatterns = [
     path('like_index/<slug>', views.like_index, name='like_index'),
     path('post/<slug>/favorited', views.toggle_favorite, name='toggle_favorite'),
     path('post/<slug>/liked', views.toggle_like, name='toggle_like'),
+    path('<request.user>/<pk>/followed', views.toggle_follow, name='toggle_follow'),    
     path('<request.user>/liked', views.liked, name='liked'),
     path('<request.user>/posted', views.posted, name='posted'),
     path('<request.user>/commented', views.commented, name='commented'),
@@ -36,6 +37,8 @@ urlpatterns = [
     # REST API urls
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('api/v1/posts/', views.ListCreatePost.as_view(), name='post_list'),
+    path('api/v1/follows/', views.FollowListCreateView.as_view(), name="follow_list"),
+    path('api/v1/followdestroy/<str:username>/', views.FollowDestroyView.as_view(), name="follow_destroy"),
     # Registration/admin urls
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.backends.simple.urls')),

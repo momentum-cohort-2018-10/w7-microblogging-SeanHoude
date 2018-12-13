@@ -8,12 +8,11 @@ from django.db.models import Count
 from django.contrib import messages
 from blog.models import User, Post, Comment, Favorite, Like, Follow
 from blog.forms import PostForm, ContactForm, CommentForm
-from blog.serializers import PostSerializer, CommentSerializer
+from blog.serializers import PostSerializer, CommentSerializer, FollowSerializer, UserSerializer, LikeSerializer, FavoriteSerializer
 from registration.backends.simple.views import RegistrationView
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-
 
 def index(request):
     posts = Post.objects.all().annotate(num_likes=Count('likes')).order_by('-num_likes', '-created')
@@ -44,7 +43,7 @@ def post_detail(request, slug):
         "slug": slug,
     })
 
-def create_post(request):
+def create_hail(request):
     if not request.user.is_authenticated:
         return HttpResponseRedirect('accounts/login')
 
@@ -54,7 +53,7 @@ def create_post(request):
             post = form.save(commit=False)
             post.user = request.user
             post.save()
-            message = f"Your comment has been added to '{post.title}'!"
+            message = f"Your hail has been added!"
             messages.add_message(request, messages.SUCCESS, message)
 
             return redirect('home')
@@ -188,9 +187,10 @@ def commented(request):
     return render(request, 'comments.html', {'commented_posts': commented_posts})
 
 def posted(request):
-    posts = request.user.author.all().order_by('-created')
+    posts = Post.objects.filter(user=request.user).order_by('-created')
+    # posts = request.user.user.all().order_by('-created')
 
-    return render(request, 'posted.html', {'posts': posts})
+    return render(request, 'posts/posted.html', {'posts': posts})
 
 class ListCreatePost(APIView):
     def get(self, request, format=None):
@@ -227,7 +227,6 @@ def toggle_favorite(request, slug):
     messages.add_message(request, messages.INFO, message)
     return redirect('home')
 
-
 @require_POST
 @login_required
 def toggle_like(request, slug):
@@ -256,6 +255,48 @@ def user_profile(request, username):
 
     return render(request, 'user_profile.html', {"profile": profile, "username": username})
 
+@require_POST
+@login_required
+def toggle_follow(request, pk):
+    # get the post to toggle follow on
+    profile = User.objects.get(pk=pk)
+    # see if current user has this post as a follow
+    if profile in request.user.users_followed.all():
+        # if so, delete follow
+        follow = False
+        following = 'Follow'
+        profile.followed_by.get(following=request.user).delete()
+        message = f"You have unfollowed '{profile}'."
+    else:
+        # else create follow
+        follow = True
+        following = 'Unfollow'
+        Follow.objects.create(following=request.user, followed=profile)
+        message = f"You have followed '{profile}'."
+
+    if request.is_ajax():
+        return JsonResponse({"pk": pk, "follow": follow,})
+
+    messages.add_message(request, messages.INFO, message)
+    return redirect('home')
+
+class FollowListCreateView(generics.ListCreateAPIView):
+    serializer_class = FollowSerializer
+
+    def get_queryset(self):
+        return self.request.user.is_following
+
+    def perform_create(self, serializer):
+        serializer.save(following=self.request.user)
+
+class FollowDestroyView(generics.DestroyAPIView):
+    lookup_field = 'followed__username'
+    lookup_url_kwarg = 'username'
+    
+    def get_queryset(self):
+        return self.request.user.is_following
+
+    
 # def propose_new_post(request):
 #     if request.method == "POST":
 #         form = ProposedPostForm(request.POST)

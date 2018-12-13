@@ -25,6 +25,9 @@ class Follow(Timestamp):
     following = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="is_following")
     followed = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="followed_by")
 
+    class Meta:
+        unique_together = ('following', 'followed',)
+
     def __str__(self):
         return f"Following: {self.following}, Followed: {self.followed}"
 

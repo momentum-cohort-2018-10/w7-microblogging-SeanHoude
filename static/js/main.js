@@ -48,7 +48,20 @@ $('.toggle-like-form').on('submit', function(event) {
     })
 })
 
-
+$('.toggle-follow-form').on('submit', function(event) {
+    event.preventDefault()
+    let csrfToken = $(event.target).find('[name=csrfmiddlewaretoken]').val()
+    $.ajax({
+        method: 'POST',
+        url: event.target.action,
+        data: {
+            'csrfmiddlewaretoken': csrfToken
+        }
+    }).then(function(results) {
+        $(event.target).find('.follow-button').html(results.follow ? 'Following' : 'Follow')
+        return results
+    })
+})
 
 
 

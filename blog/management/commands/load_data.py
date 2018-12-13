@@ -57,5 +57,6 @@ class Command(BaseCommand):
 
         for i in range(100):
             Follow.objects.create(following=users[i], followed=users[random.randrange(30)])
+        print('100 follows imported!')
 
         print('All data imported successfully!')
