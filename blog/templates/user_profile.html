@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Create post - {{ block.super }}
+{% endblock title %}
+
+{% block content %}
+    {% if request.user == profile %}
+        <h1>You follow:</h1>
+        {% for user in request.user.users_followed.all %}
+        <p>{{ user }}</p>
+        {% endfor %}
+        <h1>Users following you</h1>
+        {% for follower in request.user.followers.all %}
+        <p>{{ follower }}</p>
+        {% endfor %}
+    {% else %}
+        <h1>{{ profile }} follows:</h1>
+        {% for user in profile.users_followed.all %}
+        <p>{{ user }}</p>
+        {% endfor %}
+        <h1>{{ profile }}'s followers: </h1>
+        {% for follower in profile.followers.all %}
+        <p>{{ follower }}</p>
+        {% endfor %}
+    {% endif %}
+{% endblock content %}

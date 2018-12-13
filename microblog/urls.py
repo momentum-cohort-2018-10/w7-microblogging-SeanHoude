@@ -27,6 +27,7 @@ urlpatterns = [
     path('<request.user>/liked', views.liked, name='liked'),
     path('<request.user>/posted', views.posted, name='posted'),
     path('<request.user>/commented', views.commented, name='commented'),
+    path('profiles/<username>/', views.user_profile, name='user_profile'),
     # Password Reset URL's
     path('accounts/password/reset/', PasswordResetView.as_view(template_name='registration/password_reset_form.html'), name="password_reset"),
     path('accounts/password/reset/done/', PasswordResetDoneView.as_view(template_name='registration/password_reset_done.html'), name="password_reset_done"),

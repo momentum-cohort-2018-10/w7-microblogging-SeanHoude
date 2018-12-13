@@ -27,11 +27,17 @@
                 <li class="glow"><a href="#">Your likes</a></li>
                 <li class="glow"><a href="#">Your comments</a></li>
                 <li class="glow"><a href="#">Your favorites</a></li>
-                <li class="glow"><a href="#">Your followers</a></li>
+                <li><a href="#">Your followers</a>
+                  <ul class="menu vertical nester">
+                    {% for user in request.user.followers.all %}
+                    <li class="glow"><a href="{% url 'user_profile' username=user.username %}">{{ user }}</a></li>
+                    {% endfor %}
+                  </ul>
+                </li>
                 <li><a href="#">Following</a>
                   <ul class="menu vertical nested">
                     {% for user in request.user.users_followed.all %}
-                    <li class="glow"><a href="#">{{ user }}</a></li>
+                    <li class="glow"><a href="{% url 'user_profile' username=user.username %}">{{ user }}</a></li>
                     {% endfor %}
                   </ul>
                 </li>

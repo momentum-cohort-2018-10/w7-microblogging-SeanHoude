@@ -6,7 +6,7 @@ from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.db.models import Count
 from django.contrib import messages
-from blog.models import Post, Comment, Favorite, Like, Follow
+from blog.models import User, Post, Comment, Favorite, Like, Follow
 from blog.forms import PostForm, ContactForm, CommentForm
 from blog.serializers import PostSerializer, CommentSerializer
 from registration.backends.simple.views import RegistrationView
@@ -214,7 +214,7 @@ def toggle_favorite(request, slug):
         # if so, delete favorite
         favorite = False
         post.favorites.get(user=request.user).delete()
-        message = f"You have unfavorited '{post}''."
+        message = f"You have unfavorited '{post}'."
     else:
         # else create favorite
         favorite = True
@@ -238,7 +238,7 @@ def toggle_like(request, slug):
         # if so, delete favorite
         like = False
         post.likes.get(user=request.user).delete()
-        message = f"You have unliked '{post}''."
+        message = f"You have unliked '{post}'."
     else:
         # else create like
         like = True
@@ -250,6 +250,11 @@ def toggle_like(request, slug):
 
     messages.add_message(request, messages.INFO, message)
     return redirect('home')
+
+def user_profile(request, username):
+    profile = User.objects.get(username=username)
+
+    return render(request, 'user_profile.html', {"profile": profile, "username": username})
 
 # def propose_new_post(request):
 #     if request.method == "POST":
