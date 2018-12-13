@@ -212,20 +212,44 @@ def toggle_favorite(request, slug):
     # see if current user has this post as a favorite
     if post in request.user.favorite_posts.all():
         # if so, delete favorite
-        favorited = False
+        favorite = False
         post.favorites.get(user=request.user).delete()
-        message = f"You have unfavorited {post}."
+        message = f"You have unfavorited '{post}''."
     else:
         # else create favorite
-        favorited = True
+        favorite = True
         post.favorites.create(user=request.user)
-        message = f"You have favorited {post}."
+        message = f"You have favorited '{post}'."
 
     if request.is_ajax():
-        return JsonResponse({"slug": slug, "favorite": favorited, "num_of_favorites": post.favorites.count()})
+        return JsonResponse({"slug": slug, "favorite": favorite, "num_of_favorites": post.favorites.count()})
 
     messages.add_message(request, messages.INFO, message)
-    return redirect(to='post_list')
+    return redirect('home')
+
+
+@require_POST
+@login_required
+def toggle_like(request, slug):
+    # get the post to toggle like on
+    post = Post.objects.get(slug=slug)
+    # see if current user has this post as a like
+    if post in request.user.liked_posts.all():
+        # if so, delete favorite
+        like = False
+        post.likes.get(user=request.user).delete()
+        message = f"You have unliked '{post}''."
+    else:
+        # else create like
+        like = True
+        post.likes.create(user=request.user)
+        message = f"You have liked '{post}'."
+
+    if request.is_ajax():
+        return JsonResponse({"slug": slug, "like": like, "num_of_likes": post.likes.count()})
+
+    messages.add_message(request, messages.INFO, message)
+    return redirect('home')
 
 # def propose_new_post(request):
 #     if request.method == "POST":
@@ -240,9 +264,3 @@ def toggle_favorite(request, slug):
 #         form = ProposedPostForm()
 
 #     return render(request, "posts/propose_new_post.html", {"form": form})
-
-# def toggle_favorite(request):
-#     if request.is_ajax():
-#         return JsonResponse({'post_id': post_id, 'like': liked, 'num_of_likes': post.likes.count()})
-#     else:
-#         pass

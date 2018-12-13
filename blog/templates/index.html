@@ -11,8 +11,7 @@
 {% endfor %}
 <h1>Users following you</h1>
 {% for follower in request.user.followers.all %}
-{{ follower }}
-<p></p>
+<p>{{ follower }}</p>
 {% endfor %}
   <h1><a href="{% provider_login_url 'github' %}"></a></h1>
   <div class="blog-post">
@@ -21,14 +20,25 @@
     <h3><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }} <small>{{ post.created }}</small></a></h3>
     <p>{{ post.description|truncatechars:150 }}</p>
       <ul class="menu simple">
-        <li><a href="#">Favorited {{ post.favorites.count }} time{{ post.favorites.count|pluralize }}</a></li>
-        <li><a href="#">Liked {{ post.likes.count }} time{{ post.likes.count|pluralize }}</a></li>
+        <li id="fav-{{ post.slug }}"><a class="num-favorites" href="#">Favorited {{ post.favorites.count }} time{{ post.favorites.count|pluralize }}</a></li>
         <!--  show favorite button if user is logged in  -->
-        <form method="POST" action="{% url 'toggle_favorite' slug=post.slug %}">
+        <form class="toggle-favorite-form" method="POST" action="{% url 'toggle_favorite' slug=post.slug %}">
           {% csrf_token %}
           <input type="hidden" name="post" value="{{ post.slug }}">
-          <button class="star-five" type="submit">
-            {% if post in favorite_posts %}
+          <button class="star-five fav-button" type="submit">
+            {% if post in request.user.favorite_posts.all %}
+            &#x2605; <!-- filled in star -->
+            {% else %}
+            &#x2606; <!-- empty star -->
+            {% endif %}
+          </button>
+        </form>
+        <li id="like-{{ post.slug }}"><a class="num-likes" href="#">Liked {{ post.likes.count }} time{{ post.likes.count|pluralize }}</a></li>
+        <form class="toggle-like-form" method="POST" action="{% url 'toggle_like' slug=post.slug %}">
+          {% csrf_token %}
+          <input type="hidden" name="post" value="{{ post.slug }}">
+          <button class="star-five like-button" type="submit">
+            {% if post in request.user.liked_posts.all %}
             &#x2605; <!-- filled in star -->
             {% else %}
             &#x2606; <!-- empty star -->

@@ -13,7 +13,7 @@ class User(AbstractUser):
     # users_followed returns all users a specific user (clinton) is following.
     #   ex clinton following Rondale and Peter
     #   clinton = User.objects.create('clinton')
-    #   clinton.users_followed.all() - // <queryset[<user: rondale>, <user: peter>]> 
+    #   clinton.users_followed.all() - // <queryset[<user: rondale>, <user: peter>]>
 
     # followers returns all users a specific user (tiana) is followed by.
     #   ex. Clinton and Rondale following Tiana
@@ -39,7 +39,7 @@ class Post(Timestamp):
 
     def __str__(self):
         return self.title
-    
+
     def save(self, *args, **kwargs):
         if not self.id:
             self.slug = slugify(self.title)
