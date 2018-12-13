@@ -22,7 +22,7 @@
           <ul class="dropdown menu" data-dropdown-menu>
             <li class="menu-text">TwitFeed</li>
               <li class="glow"><a href="{% url 'home' %}">Home</a></li>
-            <li><a href="#">{{ request.user }}</a>
+            <li><a href="{% url 'user_profile' username=request.user.username %}">{{ request.user }}</a>
               <ul class="menu vertical nested">
                 <li class="glow"><a href="#">Your likes</a></li>
                 <li class="glow"><a href="#">Your comments</a></li>
