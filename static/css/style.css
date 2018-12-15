@@ -52,3 +52,7 @@ ul {
     border: solid 1px blue;
     max-width: 400px;
 }
+
+.follow-button {
+    color: blue;
+}

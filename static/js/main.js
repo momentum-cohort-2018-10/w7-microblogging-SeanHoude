@@ -58,7 +58,7 @@ $('.toggle-follow-form').on('submit', function(event) {
             'csrfmiddlewaretoken': csrfToken
         }
     }).then(function(results) {
-        $(event.target).find('.follow-button').html(results.follow ? 'Following' : 'Follow')
+        $(event.target).find('.follow-button').html(results.follow ? 'Unfollow' : 'Follow')
         return results
     })
 })

@@ -27,8 +27,8 @@
               <li><a href="{% url 'user_profile' username=request.user.username %}">{{ request.user }}</a>
               <ul class="menu vertical nested">
                 <li class="glow"><a href="{% url 'posted' %}">Your hails</a></li>
-                <li class="glow"><a href="{% url 'post_list' %}">Api Posts</a></li>
-                <li class="glow"><a href="{% url 'follow_list' %}">Api Follows</a></li>
+                <li class="glow"><a href="{% url 'post_list_create' %}">Api Posts</a></li>
+                <li class="glow"><a href="{% url 'follow_list_create' %}">Api Follows</a></li>
                 <li class="glow"><a href="#">Your likes</a></li>
                 <li class="glow"><a href="#">Your comments</a></li>
                 <li class="glow"><a href="#">Your favorites</a></li>

@@ -10,9 +10,14 @@ from blog.models import User, Post, Comment, Favorite, Like, Follow
 from blog.forms import PostForm, ContactForm, CommentForm
 from blog.serializers import PostSerializer, CommentSerializer, FollowSerializer, UserSerializer, LikeSerializer, FavoriteSerializer
 from registration.backends.simple.views import RegistrationView
-from rest_framework import status, generics
+from rest_framework import status, generics, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import detail_route
+from registration.views import RegistrationView
+
+class NewRegistrationView(RegistrationView):
+    success_url = 'home'
 
 def index(request):
     posts = Post.objects.all().annotate(num_likes=Count('likes')).order_by('-num_likes', '-created')
@@ -192,31 +197,15 @@ def posted(request):
 
     return render(request, 'posts/posted.html', {'posts': posts})
 
-class ListCreatePost(APIView):
-    def get(self, request, format=None):
-        posts = Post.objects.all()
-        serializer = PostSerializer(posts, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, format=None):
-        serializer = PostSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 @require_POST
 @login_required
 def toggle_favorite(request, slug):
-    # get the post to toggle favorite on
     post = Post.objects.get(slug=slug)
-    # see if current user has this post as a favorite
     if post in request.user.favorite_posts.all():
-        # if so, delete favorite
         favorite = False
         post.favorites.get(user=request.user).delete()
         message = f"You have unfavorited '{post}'."
     else:
-        # else create favorite
         favorite = True
         post.favorites.create(user=request.user)
         message = f"You have favorited '{post}'."
@@ -230,16 +219,12 @@ def toggle_favorite(request, slug):
 @require_POST
 @login_required
 def toggle_like(request, slug):
-    # get the post to toggle like on
     post = Post.objects.get(slug=slug)
-    # see if current user has this post as a like
     if post in request.user.liked_posts.all():
-        # if so, delete favorite
         like = False
         post.likes.get(user=request.user).delete()
         message = f"You have unliked '{post}'."
     else:
-        # else create like
         like = True
         post.likes.create(user=request.user)
         message = f"You have liked '{post}'."
@@ -258,17 +243,13 @@ def user_profile(request, username):
 @require_POST
 @login_required
 def toggle_follow(request, pk):
-    # get the post to toggle follow on
     profile = User.objects.get(pk=pk)
-    # see if current user has this post as a follow
     if profile in request.user.users_followed.all():
-        # if so, delete follow
         follow = False
         following = 'Follow'
         profile.followed_by.get(following=request.user).delete()
         message = f"You have unfollowed '{profile}'."
     else:
-        # else create follow
         follow = True
         following = 'Unfollow'
         Follow.objects.create(following=request.user, followed=profile)
@@ -280,7 +261,26 @@ def toggle_follow(request, pk):
     messages.add_message(request, messages.INFO, message)
     return redirect('home')
 
-class FollowListCreateView(generics.ListCreateAPIView):
+# Api Views
+# class PostListCreate(APIView):
+#     def get(self, request, format=None):
+#         posts = Post.objects.all()
+#         serializer = PostSerializer(posts, many=True)
+#         return Response(serializer.data)
+
+#     def post(self, request, format=None):
+#         serializer = PostSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class PostListCreate(generics.ListCreateAPIView):
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        return Post.objects.all()
+
+class FollowListCreate(generics.ListCreateAPIView):
     serializer_class = FollowSerializer
 
     def get_queryset(self):
@@ -289,14 +289,44 @@ class FollowListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(following=self.request.user)
 
-class FollowDestroyView(generics.DestroyAPIView):
+class FollowRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'followed__username'
     lookup_url_kwarg = 'username'
     
     def get_queryset(self):
         return self.request.user.is_following
 
-    
+class CommentListCreate(generics.ListCreateAPIView):
+    serializer_class = CommentSerializer
+
+    def get_queryset(self):
+        return Comment.objects.all()
+
+# API V2 ViewSets
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+    @detail_route(methods=['get'])
+    def comments(self, request, pk=None):
+        self.pagination_class.page_size = 1
+        comments = Comment.objects.filter(pk=pk)
+        page = self.paginate_queryset(comments)
+
+        if page is not None:
+            serializer = CommentSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+         
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    # def perform_create(self, serializer):
+    #     serializer.save(user=self.request.user)
+
 # def propose_new_post(request):
 #     if request.method == "POST":
 #         form = ProposedPostForm(request.POST)

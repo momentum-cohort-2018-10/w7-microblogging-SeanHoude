@@ -52,8 +52,8 @@ class Post(Timestamp):
         return "posts/%s/" % self.slug
 
 class Comment(Timestamp):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, related_name="comments")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="user_comments")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, related_name="post_comments")
     comment = models.CharField(max_length=400)
 
     def __str__(self):

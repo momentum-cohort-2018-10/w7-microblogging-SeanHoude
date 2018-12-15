@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth.views import (
     PasswordResetView, PasswordResetDoneView, PasswordResetConfirmView, PasswordResetCompleteView,
 )
-
+from blog.routers import router
 
 urlpatterns = [
     path('', views.index, name='home'),
@@ -36,13 +36,17 @@ urlpatterns = [
     path('accounts/password/done/', PasswordResetCompleteView.as_view(template_name='registration/password_reset_complete.html'), name="password_reset_complete"),
     # REST API urls
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    path('api/v1/posts/', views.ListCreatePost.as_view(), name='post_list'),
-    path('api/v1/follows/', views.FollowListCreateView.as_view(), name="follow_list"),
-    path('api/v1/followdestroy/<str:username>/', views.FollowDestroyView.as_view(), name="follow_destroy"),
+    path('api/v1/posts/', views.PostListCreate.as_view(), name='post_list_create'),
+    path('api/v1/follows/', views.FollowListCreate.as_view(), name="follow_list_create"),
+    path('api/v1/followdestroy/<str:username>/', views.FollowRetrieveUpdateDestroy.as_view(), name="follow_destroy"),
+    path('api/v1/comments/create', views.CommentListCreate.as_view(), name='comment_create'),
+    # REST API V2
+    path('api/v2/', include((router.urls, 'posts'), namespace='apiv2')),
     # Registration/admin urls
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.backends.simple.urls')),
-    path('accounts/', include('allauth.urls')),
+    path('accounts/register', views.NewRegistrationView.as_view(), name='register'),
+    path('accounts/allauth/', include('allauth.urls')),
 ]
 
 if settings.DEBUG:
