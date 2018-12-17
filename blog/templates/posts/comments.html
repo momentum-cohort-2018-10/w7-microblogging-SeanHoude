@@ -6,21 +6,68 @@
 {% endblock title %}
 
 {% block content %}
-    <div class="container">
-        <div class="row">
-        {% for post in commented_posts %}
-            <div class="col-md-4 card">
-                <h3><a href="{{ post.url }}">{{ post.title }}</a></h3>
-                {% for comment in post.comments.all %}
-                    {% if request.user == comment.user %}
-                        <div class="comment">
-                            <strong>by: {{ comment.user }} on {{ comment.created }}</strong>
-                            <p>{{ comment.comment|linebreaks }}</p>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        {% endfor %}
-        </div>
-    </div>
+  <div class="blog-post">
+  {% for post in commented_posts %}
+  <div class="callout">
+  <h3><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }} <small>{{ post.created }}</small></a></h3>
+  <p>{{ post.description|truncatechars:150 }}</p>
+    <ul class="menu simple">
+      <li id="fav-{{ post.slug }}"><a class="num-favorites" href="#">Favorited {{ post.favorites.count }} time{{ post.favorites.count|pluralize }}</a></li>
+      <!--  show favorite button if user is logged in  -->
+      <form class="toggle-favorite-form" method="POST" action="{% url 'toggle_favorite' slug=post.slug %}">
+        {% csrf_token %}
+        <input type="hidden" name="post" value="{{ post.slug }}">
+        <button class="fav-button" type="submit">
+          {% if post in request.user.favorite_posts.all %}
+          &#x2605; <!-- filled in star -->
+          {% else %}
+          &#x2606; <!-- empty star -->
+          {% endif %}
+        </button>
+      </form>
+      <li id="like-{{ post.slug }}"><a class="num-likes" href="#">Liked {{ post.likes.count }} time{{ post.likes.count|pluralize }}</a></li>
+      <form class="toggle-like-form" method="POST" action="{% url 'toggle_like' slug=post.slug %}">
+        {% csrf_token %}
+        <input type="hidden" name="post" value="{{ post.slug }}">
+        <button class="like-button" type="submit">
+          {% if post in request.user.liked_posts.all %}
+          &#x2605; <!-- filled in star -->
+          {% else %}
+          &#x2606; <!-- empty star -->
+          {% endif %}
+        </button>
+      </form>
+      <li><a href="{% url 'user_profile' username=post.user %}"> Hailer: {{ post.user }} -</a></li>
+      <form class="toggle-follow-form" method="POST" action="{% url 'toggle_follow' pk=post.user.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="follow">
+        <button class="follow-button" type="submit">
+          {% if post.user in request.user.users_followed.all %}
+          <li class="glow">Unfollow</li>
+          {% else %}
+          <li class="glow">Follow</li>
+          {% endif %}
+        </button>
+      </form>
+    </ul>
+  </div>
+    {% for comment in post.post_comments.all %}
+    {% if request.user == comment.user %}
+      <div class="comment">
+        <p>{{ comment.comment }} - <a href="{% url "user_profile" username=post.user %}"><em>{{ comment.user }}</em></a> on {{ comment.created }}</p>
+        {% if request.user == comment.user %}
+        <form class="ilb" action="{% url 'delete_comment' pk=comment.pk slug=post.slug %}">
+          {% csrf_token %}
+          <input class="ilb" type="image" src="{% static 'images/delete.png' %}">
+        </form>
+        <a class="ilb" href="{% url 'edit_comment' pk=comment.pk slug=post.slug %}">
+        <input type="image" src="{% static 'images/edit.png' %}">
+        </a>
+        {% endif %}
+      </div>
+    {% endif %}
+    {% endfor %}
+  
+{% endfor %}
+</div>
 {% endblock content %}

@@ -163,6 +163,8 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
+ACCOUNT_ACTIVATION_DAYS = 7
+LOGIN_REDIRECT_URL = 'home'
 INTERNAL_IPS = ['127.0.0.1']
 MESSAGE_TAGS = {
     messages.SUCCESS: 'callout success',
@@ -173,4 +175,4 @@ MESSAGE_TAGS = {
 AUTH_USER_MODEL = "blog.User"
 SITE_ID = 1
 # Activate Django-Heroku.
-# django_heroku.settings(locals())
+django_heroku.settings(locals())

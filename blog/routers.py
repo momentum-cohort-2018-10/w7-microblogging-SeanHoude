@@ -5,3 +5,4 @@ from blog import views
 router = routers.SimpleRouter()
 router.register('posts', views.PostViewSet)
 router.register('comments', views.CommentViewSet)
+router.register('users', views.UserViewSet)

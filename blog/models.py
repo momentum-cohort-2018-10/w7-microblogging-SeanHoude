@@ -39,6 +39,7 @@ class Post(Timestamp):
     slug = models.SlugField(unique=True, max_length=250)
     favorited_by = models.ManyToManyField(User, through='Favorite', related_name='favorite_posts')
     liked_by = models.ManyToManyField(User, through='Like', related_name='liked_posts')
+    commented_by = models.ManyToManyField(User, through='comment', related_name='commented_posts')
 
     def __str__(self):
         return self.title

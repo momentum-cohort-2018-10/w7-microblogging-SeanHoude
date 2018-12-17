@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}
-    Your Hails - {{ block.super }}
+    Your Favorites - {{ block.super }}
 {% endblock title %}
 
 {% block content %}
-    <div class="blog-post">
-    {% for post in posts %}
-    <div class="callout">
-    <h3><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }} <small>{{ post.created }}</small></a></h3>
-    <p>{{ post.description|truncatechars:150 }}</p>
+<div class="blog-post">
+{% for post in favorite_posts %}
+  <div class="callout">
+  <h3><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }} <small>{{ post.created }}</small></a></h3>
+  <p>{{ post.description|truncatechars:150 }}</p>
     <ul class="menu simple">
       <li id="fav-{{ post.slug }}"><a class="num-favorites" href="#">Favorited {{ post.favorites.count }} time{{ post.favorites.count|pluralize }}</a></li>
       <form class="toggle-favorite-form" method="POST" action="{% url 'toggle_favorite' slug=post.slug %}">
@@ -48,22 +48,22 @@
         </button>
       </form>
     </ul>
-    </div>
+  </div>
     {% for comment in comments %}
       <div class="comment">
         <p>{{ comment.comment }} - <a href="{% url "user_profile" username=post.user %}"><em>{{ comment.user }}</em></a> on {{ comment.created }}</p>
         {% if request.user == comment.user %}
         <form class="ilb" action="{% url 'delete_comment' pk=comment.pk slug=post.slug %}">
-        {% csrf_token %}
-        <input class="ilb" type="image" src="{% static 'images/delete.png' %}">
+          {% csrf_token %}
+          <input class="ilb" type="image" src="{% static 'images/delete.png' %}">
         </form>
         <a class="ilb" href="{% url 'edit_comment' pk=comment.pk slug=post.slug %}">
-        <input type="image" src="{% static 'images/edit.png' %}">
+          <input type="image" src="{% static 'images/edit.png' %}">
         </a>
         {% endif %}
       </div>
     {% endfor %}
-    {% endfor %}
-  </div>
+{% endfor %}
+</div>
 {% endblock content %} 
 

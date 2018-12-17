@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}
-    Your Hails - {{ block.super }}
+    Your likes - {{ block.super }}
 {% endblock title %}
 
 {% block content %}
-    <div class="blog-post">
-    {% for post in posts %}
+  <div class="blog-post">
+    {% for post in liked_posts %}
     <div class="callout">
     <h3><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }} <small>{{ post.created }}</small></a></h3>
     <p>{{ post.description|truncatechars:150 }}</p>

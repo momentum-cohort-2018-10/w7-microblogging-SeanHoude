@@ -7,8 +7,8 @@ from django.http import HttpResponseRedirect
 from django.db.models import Count
 from django.contrib import messages
 from blog.models import User, Post, Comment, Favorite, Like, Follow
-from blog.forms import PostForm, ContactForm, CommentForm
-from blog.serializers import PostSerializer, CommentSerializer, FollowSerializer, UserSerializer, LikeSerializer, FavoriteSerializer
+from blog.forms import PostForm, CommentForm
+from blog.serializers import PostSerializer, CommentSerializer, FollowedSerializer, FollowSerializer, FollowingSerializer, UserSerializer
 from registration.backends.simple.views import RegistrationView
 from rest_framework import status, generics, viewsets
 from rest_framework.views import APIView
@@ -26,7 +26,7 @@ def index(request):
 
 def post_detail(request, slug):
     post = Post.objects.get(slug=slug)
-    comments = post.comments.all().order_by('-created')
+    comments = post.post_comments.all().order_by('-created')
 
     if request.method == 'POST':
         form = CommentForm(request.POST)
@@ -105,7 +105,7 @@ def add_comment_to_post(request, slug):
     else:
         form = CommentForm()
 
-    return render(request, 'post_detail.html', {
+    return render(request, 'posts/post_detail.html', {
         'post': post,
         'form': form,
         'slug': slug,
@@ -123,23 +123,13 @@ def edit_comment(request, slug, pk):
             form.save()
             message = f"Your comment has been edited!"
             messages.add_message(request, messages.SUCCESS, message)
-            return redirect('post_detail', slug=post.slug)
+            return redirect('post_detail', slug)
     else:
         form = CommentForm(instance=comment)
 
-    return render(request, 'edit_comment.html', {
+    return render(request, 'posts/edit_comment.html', {
         'comment': comment,
         'form': form,
-    })
-
-def get_post_list(request, header, posts):
-    fav_posts = posts.annotate(num_favorites=Count('favorites'))
-    favorite_posts = []
-    if request.user.is_authenticated:
-        favorite_posts = request.user.favorite_posts.all()
-
-    return render(request, 'index.html', {
-        'favorite_posts': favorite_posts
     })
 
 def delete_comment(request, slug, pk):
@@ -148,29 +138,6 @@ def delete_comment(request, slug, pk):
     comment.delete()
     message = f"Your comment has been removed from '{post.title}'!"
     messages.add_message(request, messages.WARNING, message)
-
-    return redirect('post_detail', slug)
-
-def like(request, slug):
-    post = Post.objects.get(slug=slug)
-    if post in request.user.liked_posts.all():
-        liked = True
-        post.likes.get(user=request.user).delete()
-        message = f"Your like has been removed from the post '{post.title}'!"
-        messages.add_message(request, messages.WARNING, message)
-    else:
-        liked = False
-        post.likes.create(user=request.user)
-        message = f"You added a like for the post '{post.title}'!"
-        messages.add_message(request, messages.SUCCESS, message)
-
-def like_index(request, slug=None):
-    like(request, slug)
-
-    return redirect('home')
-
-def like_detail(request, slug):
-    like(request, slug)
 
     return redirect('post_detail', slug)
 
@@ -184,16 +151,20 @@ def search(request):
 def liked(request):
     liked_posts = request.user.liked_posts.all()
 
-    return render(request, 'liked.html', {'liked_posts': liked_posts})
+    return render(request, 'posts/liked.html', {'liked_posts': liked_posts})
+
+def favorited(request):
+    favorite_posts = request.user.favorite_posts.all()
+
+    return render(request, 'posts/favorited.html', {'favorite_posts': favorite_posts})
 
 def commented(request):
-    commented_posts = request.user.user_comments.all().order_by('-created').distinct()
+    commented_posts = request.user.commented_posts.all().order_by('-created').distinct()
 
-    return render(request, 'comments.html', {'commented_posts': commented_posts})
+    return render(request, 'posts/comments.html', {'commented_posts': commented_posts})
 
 def posted(request):
     posts = Post.objects.filter(user=request.user).order_by('-created')
-    # posts = request.user.user.all().order_by('-created')
 
     return render(request, 'posts/posted.html', {'posts': posts})
 
@@ -256,7 +227,7 @@ def toggle_follow(request, pk):
         message = f"You have followed '{profile}'."
 
     if request.is_ajax():
-        return JsonResponse({"pk": pk, "follow": follow,})
+        return JsonResponse({"pk": pk, "follow": follow})
 
     messages.add_message(request, messages.INFO, message)
     return redirect('home')
@@ -292,7 +263,7 @@ class FollowListCreate(generics.ListCreateAPIView):
 class FollowRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'followed__username'
     lookup_url_kwarg = 'username'
-    
+
     def get_queryset(self):
         return self.request.user.is_following
 
@@ -316,13 +287,17 @@ class PostViewSet(viewsets.ModelViewSet):
         if page is not None:
             serializer = CommentSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-         
+ 
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
     # def perform_create(self, serializer):
     #     serializer.save(user=self.request.user)

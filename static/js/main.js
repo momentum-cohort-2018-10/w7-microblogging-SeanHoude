@@ -63,7 +63,25 @@ $('.toggle-follow-form').on('submit', function(event) {
     })
 })
 
-
+let demo = new VTTCue({
+    el: '#posts-div',
+    data: {
+        'title': '',
+        'user': '',
+        'description': '',
+        'favorited_by': [],
+        'liked_by': [],
+        'created': [],
+    },
+    ready: function() {
+        this.$http.get('http://127.0.0.1:8000/api/v2/posts/').then(function(response) {
+            this.posts = reponse.data
+        },
+        function(response) {
+            console.log(response)
+        })
+    }
+})
 
 //         success: function(results) {
 //             $(event.target).find('button[type=submit]').html(results.favorite ? FILLED_IN_STAR : EMPTY_STAR)

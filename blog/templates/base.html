@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>
-        {% block title %}TwitFeed{% endblock title %}
+        {% block title %}HailStorm{% endblock title %}
     </title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/foundation-sites@6.5.1/dist/css/foundation.min.css" integrity="sha256-1mcRjtAxlSjp6XJBgrBeeCORfBp/ppyX4tsvpQVCcpA= sha384-b5S5X654rX3Wo6z5/hnQ4GBmKuIJKMPwrJXn52ypjztlnDK2w9+9hSMBz/asy9Gw sha512-M1VveR2JGzpgWHb0elGqPTltHK3xbvu3Brgjfg4cg5ZNtyyApxw/45yHYsZ/rCVbfoO5MSZxB241wWq642jLtA==" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -27,11 +27,11 @@
               <li><a href="{% url 'user_profile' username=request.user.username %}">{{ request.user }}</a>
               <ul class="menu vertical nested">
                 <li class="glow"><a href="{% url 'posted' %}">Your hails</a></li>
-                <li class="glow"><a href="{% url 'post_list_create' %}">Api Posts</a></li>
-                <li class="glow"><a href="{% url 'follow_list_create' %}">Api Follows</a></li>
-                <li class="glow"><a href="#">Your likes</a></li>
-                <li class="glow"><a href="#">Your comments</a></li>
-                <li class="glow"><a href="#">Your favorites</a></li>
+                <li class="glow"><a href="{% url 'commented' %}">Your comments</a></li>
+                <li class="glow"><a href="{% url 'liked' %}">Your likes</a></li>
+                <li class="glow"><a href="{% url 'favorited' %}">Your favorites</a></li>
+                <li class="glow"><a href="{% url 'apiv2:post-list' %}">Api Posts</a></li>
+                <li class="glow"><a href="{% url 'apiv2:user-list' %}">Api Users</a></li>
                 <li><a href="#">Your followers</a>
                   <ul class="menu vertical nester">
                     {% for user in request.user.followers.all %}
@@ -103,6 +103,8 @@
   <script src="{% static 'js/vendor/what-input.js' %}" defer></script>
   <script src="{% static 'js/vendor/foundation.js' %}" defer></script>
   <script src="{% static 'js/app.js' %}" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.21/dist/vue.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1" defer></script>
   <script src="{% static 'js/main.js' %}" defer></script>
 </body>
 </html>

@@ -19,13 +19,12 @@ urlpatterns = [
          name="add_comment_to_post"),
     path('post/<slug>/<pk>/edit_comment', views.edit_comment, name='edit_comment'),
     path('post/<slug>/<pk>/delete_comment', views.delete_comment, name='delete_comment'),
-    path('post/<slug>/like', views.like_detail, name='like_detail'),
     path('search', views.search, name='search'),
-    path('like_index/<slug>', views.like_index, name='like_index'),
     path('post/<slug>/favorited', views.toggle_favorite, name='toggle_favorite'),
     path('post/<slug>/liked', views.toggle_like, name='toggle_like'),
     path('<request.user>/<pk>/followed', views.toggle_follow, name='toggle_follow'),    
     path('<request.user>/liked', views.liked, name='liked'),
+    path('<request.user>/favorited', views.favorited, name='favorited'),
     path('<request.user>/posted', views.posted, name='posted'),
     path('<request.user>/commented', views.commented, name='commented'),
     path('profiles/<username>/', views.user_profile, name='user_profile'),
@@ -45,7 +44,7 @@ urlpatterns = [
     # Registration/admin urls
     path('admin/', admin.site.urls),
     path('accounts/', include('registration.backends.simple.urls')),
-    path('accounts/register', views.NewRegistrationView.as_view(), name='register'),
+    path('accounts/register', views.NewRegistrationView.as_view(), name='registration_register'),
     path('accounts/allauth/', include('allauth.urls')),
 ]
 
