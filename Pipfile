@@ -19,6 +19,7 @@ pillow = "*"
 django-allauth = "*"
 python-dotenv = "*"
 django-heroku = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"
