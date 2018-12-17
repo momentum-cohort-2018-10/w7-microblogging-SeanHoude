@@ -12,7 +12,6 @@
   <p>{{ post.description|truncatechars:150 }}</p>
     <ul class="menu simple">
       <li id="fav-{{ post.slug }}"><a class="num-favorites" href="#">Favorited {{ post.favorites.count }} time{{ post.favorites.count|pluralize }}</a></li>
-      <!--  show favorite button if user is logged in  -->
       <form class="toggle-favorite-form" method="POST" action="{% url 'toggle_favorite' slug=post.slug %}">
         {% csrf_token %}
         <input type="hidden" name="post" value="{{ post.slug }}">
